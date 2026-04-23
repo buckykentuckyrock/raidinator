@@ -3,7 +3,44 @@ const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle,
 const cron = require('node-cron');
 const fs = require('fs');
 require('dotenv').config();
-const db = require('./database');
+//const db = require('./database');
+
+const Database = require('better-sqlite3');
+
+const db = new Database('/data/bot.db');
+
+if (process.env.RUN_MIGRATION === "true") {
+  console.log("🚀 Running points migration...");
+
+  // ensure table exists
+  db.prepare(`
+    CREATE TABLE IF NOT EXISTS points (
+      username TEXT PRIMARY KEY,
+      points INTEGER
+    )
+  `).run();
+
+  // load JSON
+  const data = JSON.parse(fs.readFileSync('./points.json', 'utf8'));
+
+  const stmt = db.prepare(`
+    INSERT INTO points (username, points)
+    VALUES (?, ?)
+    ON CONFLICT(username) DO UPDATE SET points=excluded.points
+  `);
+
+  for (const key in data) {
+    const user = data[key];
+
+    stmt.run(user.name, user.points);
+
+    console.log(`Migrated: ${user.name} -> ${user.points}`);
+  }
+
+  console.log("✅ Migration complete");
+
+  process.exit(0); // VERY IMPORTANT
+}
 
 
 process.on("unhandledRejection", console.error);
