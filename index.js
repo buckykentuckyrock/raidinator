@@ -3,6 +3,8 @@ const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle,
 const cron = require('node-cron');
 const fs = require('fs');
 require('dotenv').config();
+const db = require('./database');
+
 
 process.on("unhandledRejection", console.error);
 process.on("uncaughtException", console.error);
@@ -25,7 +27,8 @@ const supchatRoleId = "791007964525625354";
 try {
   const data = fs.readFileSync('responses.json', 'utf8');
   const parsed = JSON.parse(data);
-  responses = new Map(Object.entries(parsed));
+  //responses = new Map(Object.entries(parsed));
+  responses = loadResponses();
   console.log('✅ Responses loaded from file');
 } catch (err) {
   console.log('No existing responses file, starting fresh');
@@ -157,7 +160,7 @@ client.on(Events.InteractionCreate, async interaction => {
   if (!choice) return;
 
   responses.set(userId, choice);
-  saveResponses();
+  saveResponse(userId, choice);
 
   await interaction.reply({
     content: `You selected **${choice.toUpperCase()}**`,
@@ -254,9 +257,14 @@ function saveResponses() {
   fs.writeFileSync('responses.json', JSON.stringify(obj, null, 2));
 }
 
+function loadResponses() {
+  const rows = db.prepare("SELECT * FROM responses").all();
+  return new Map(rows.map(r => [r.userId, r.choice]));
+}
+
 function clearResponses() {
-  responses.clear()
-  fs.writeFileSync('responses.json', JSON.stringify({}, null, 2));
+  responses.clear();
+  db.prepare("DELETE FROM responses").run();
   console.log('🗑️ Responses cleared');
 }
 
@@ -421,13 +429,29 @@ async function help(message) {
 
 
 function loadPoints() {
-  console.log("loadPoints")
-  return JSON.parse(fs.readFileSync('./points.json', 'utf8'));
+  const rows = db.prepare("SELECT * FROM points").all();
+  const data = {};
+
+  rows.forEach(row => {
+    data[row.username] = {
+      name: row.username,
+      points: row.points
+    };
+  });
+
+  return data;
 }
 
 function savePoints(data) {
-  console.log("sendPoints")
-  fs.writeFileSync('./points.json', JSON.stringify(data, null, 2));
+  const stmt = db.prepare(`
+    INSERT INTO points (username, points)
+    VALUES (?, ?)
+    ON CONFLICT(username) DO UPDATE SET points=excluded.points
+  `);
+
+  for (const username in data) {
+    stmt.run(username, data[username].points);
+  }
 }
 
 
