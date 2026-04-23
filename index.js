@@ -3,7 +3,10 @@ const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle,
 const cron = require('node-cron');
 const fs = require('fs');
 require('dotenv').config();
-// Create a new Discord client with message intent 
+
+process.on("unhandledRejection", console.error);
+process.on("uncaughtException", console.error);
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
