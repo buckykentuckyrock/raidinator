@@ -9,38 +9,38 @@ const Database = require('better-sqlite3');
 
 const db = new Database('/data/bot.db');
 
-if (process.env.RUN_MIGRATION === "true") {
-  console.log("🚀 Running points migration...");
+// if (process.env.RUN_MIGRATION === "true") {
+//   console.log("🚀 Running points migration...");
 
-  // ensure table exists
-  db.prepare(`
-    CREATE TABLE IF NOT EXISTS points (
-      username TEXT PRIMARY KEY,
-      points INTEGER
-    )
-  `).run();
+//   // ensure table exists
+//   db.prepare(`
+//     CREATE TABLE IF NOT EXISTS points (
+//       username TEXT PRIMARY KEY,
+//       points INTEGER
+//     )
+//   `).run();
 
-  // load JSON
-  const data = JSON.parse(fs.readFileSync('./points.json', 'utf8'));
+//   // load JSON
+//   const data = JSON.parse(fs.readFileSync('./points.json', 'utf8'));
 
-  const stmt = db.prepare(`
-    INSERT INTO points (username, points)
-    VALUES (?, ?)
-    ON CONFLICT(username) DO UPDATE SET points=excluded.points
-  `);
+//   const stmt = db.prepare(`
+//     INSERT INTO points (username, points)
+//     VALUES (?, ?)
+//     ON CONFLICT(username) DO UPDATE SET points=excluded.points
+//   `);
 
-  for (const key in data) {
-    const user = data[key];
+//   for (const key in data) {
+//     const user = data[key];
 
-    stmt.run(user.name, user.points);
+//     stmt.run(user.name, user.points);
 
-    console.log(`Migrated: ${user.name} -> ${user.points}`);
-  }
+//     console.log(`Migrated: ${user.name} -> ${user.points}`);
+//   }
 
-  console.log("✅ Migration complete");
+//   console.log("✅ Migration complete");
 
-  process.exit(0); // VERY IMPORTANT
-}
+//   process.exit(0); // VERY IMPORTANT
+// }
 
 
 process.on("unhandledRejection", console.error);
@@ -197,7 +197,11 @@ client.on(Events.InteractionCreate, async interaction => {
   if (!choice) return;
 
   responses.set(userId, choice);
-  saveResponse(userId, choice);
+  db.prepare(`
+  INSERT INTO responses (userId, choice)
+  VALUES (?, ?)
+  ON CONFLICT(userId) DO UPDATE SET choice=excluded.choice
+`).run(userId, choice);
 
   await interaction.reply({
     content: `You selected **${choice.toUpperCase()}**`,
@@ -289,10 +293,10 @@ async function sendHousingannouncement(guild) {
 }
 
 //helper function for saving to local file storage
-function saveResponses() {
-  const obj = Object.fromEntries(responses);
-  fs.writeFileSync('responses.json', JSON.stringify(obj, null, 2));
-}
+// function saveResponses() {
+//   const obj = Object.fromEntries(responses);
+//   fs.writeFileSync('responses.json', JSON.stringify(obj, null, 2));
+// }
 
 function loadResponses() {
   const rows = db.prepare("SELECT * FROM responses").all();
@@ -361,10 +365,10 @@ async function transferPoints(sender, receiver, numberOfPoints, message) {
 async function checkBalance(sender, message) {
   const data = loadPoints();
   const sanatizedSender = translateName(sender.username.toLowerCase())
-  if (sanatizedSender === "erkan") {
-    message.reply(`${sanatizedSender}, you have 1337 SUP CHAT Points™ 💰`);
-    return 0;
-  }
+  // if (sanatizedSender === "erkan") {
+  //   message.reply(`${sanatizedSender}, you have 1337 SUP CHAT Points™ 💰`);
+  //   return 0;
+  // }
   if (!sanatizedSender) {
     console.log("User not found when checking balance")
     return 0;
