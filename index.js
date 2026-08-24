@@ -360,6 +360,7 @@ async function transferPoints(sender, receiver, numberOfPoints, message) {
   } catch (error) {
     console.log(error)
   }
+
 }
 
 async function checkBalance(sender, message) {
