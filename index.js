@@ -551,6 +551,15 @@ async function sendMessage(guild) {
   }
 }
 
+async function testCron() {
+  console.log("Cron is running each minute");
+}
+
+cron.schedule('* * * * *', () => {
+  testCron()
+});
+
+
 // Listen and respond to messages 
 client.on('messageCreate', async message => {
   if (message.author.bot) return;
