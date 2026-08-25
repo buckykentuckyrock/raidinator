@@ -261,7 +261,7 @@ async function sendRaidAnnouncement(guild) {
 
     await channel.send({
       content: `<@&${supchatRoleId}> Imorn kör vi nästa epic raid kl 18:00. Kom ihåg att meddela om du vet att du inte kan dyka upp.`,
-      files: ['./raidbanner.png']
+      files: ['./raidbannersnakecity.png']
     });
 
     console.log('📢 Raid announcement sent');
@@ -496,6 +496,16 @@ function savePoints(data) {
   }
 }
 
+function getGuild() {
+  const guild = client.guilds.cache.first();
+
+  if (!guild) {
+    console.log('❌ No guild found');
+    return null;
+  }
+
+  return guild;
+}
 
 
 async function gallywixCollect(guild, targetTag) {
@@ -555,8 +565,29 @@ async function testCron() {
   console.log("Cron is running each minute");
 }
 
-cron.schedule('* * * * *', () => {
-  testCron()
+cron.schedule('0 18 * * 0', async () => {
+  const guild = getGuild();
+
+  if (!guild) return;
+
+  await sendRaidAnnouncement(guild);
+});
+
+cron.schedule('0 * * * 1', async () => {
+  const guild = getGuild();
+
+  if (!guild) return;
+
+  await sendDMsToRoleMembers(
+    guild,
+    'SUP CHAT',
+    'Ikväll är det raid vid 18:00 ska du vara med?'
+  );
+});
+
+cron.schedule('15 * * * 2', async () => {
+  clearResponses();
+  console.log('🗑️ All responses have been cleared');
 });
 
 
