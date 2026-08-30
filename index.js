@@ -570,7 +570,7 @@ cron.schedule('0 19 * * 0', async () => {
 
   if (!guild) return;
 
-  console.log("Node cron sendRaidAnnouncement");
+  console.log("Node cron sendRaidAnnouncement!!");
 
   await sendRaidAnnouncement(guild);
 }, {
