@@ -565,12 +565,16 @@ async function testCron() {
   console.log("Cron is running each minute");
 }
 
-cron.schedule('0 18 * * 0', async () => {
+cron.schedule('0 19 * * 0', async () => {
   const guild = getGuild();
 
   if (!guild) return;
 
+  console.log("Node cron sendRaidAnnouncement");
+
   await sendRaidAnnouncement(guild);
+}, {
+  timezone: 'Europe/Stockholm',
 });
 
 cron.schedule('0 * * * 1', async () => {
