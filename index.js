@@ -609,7 +609,6 @@ cron.schedule('0 12 * * 1', async () => {
 });
 
 /* Tredje DM 16:00 Måndag */
-
 cron.schedule('0 16 * * 1', async () => {
   const guild = getGuild();
   if (!guild) return;
@@ -621,6 +620,19 @@ cron.schedule('0 16 * * 1', async () => {
     'SUP CHAT',
     'Ikväll är det raid vid 18:00 ska du vara med?'
   );
+}, {
+  timezone: 'Europe/Stockholm',
+});
+
+/* Skicka summering 1 timme innan raid */
+cron.schedule('0 17 * * 1', async () => {
+  const guild = getGuild();
+  if (!guild) return;
+
+  console.log("Running summarysend 17:00 måndag");
+
+  await sendWeeklySummary(guild, 'SUP CHAT', responses);
+
 }, {
   timezone: 'Europe/Stockholm',
 });
