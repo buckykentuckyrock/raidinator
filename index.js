@@ -567,7 +567,6 @@ async function testCron() {
 
 cron.schedule('0 19 * * 0', async () => {
   const guild = getGuild();
-
   if (!guild) return;
 
   console.log("Node cron sendRaidAnnouncement!!");
@@ -577,17 +576,56 @@ cron.schedule('0 19 * * 0', async () => {
   timezone: 'Europe/Stockholm',
 });
 
-cron.schedule('0 * * * 1', async () => {
+/* Första dm vid 19:01 söndag */
+cron.schedule('1 19 * * 0', async () => {
   const guild = getGuild();
-
   if (!guild) return;
+
+  console.log("Running första DM 19:01 söndag");
+
+  await sendDMsToRoleMembers(
+    guild,
+    'SUP CHAT',
+    'Imorgon kväll är det raid vid 18:00 ska du vara med?'
+  );
+}, {
+  timezone: 'Europe/Stockholm',
+});
+
+/* Andra DM 12:00 Måndag */
+cron.schedule('0 12 * * 1', async () => {
+  const guild = getGuild();
+  if (!guild) return;
+
+  console.log("Running andra DM 12:00 måndag");
 
   await sendDMsToRoleMembers(
     guild,
     'SUP CHAT',
     'Ikväll är det raid vid 18:00 ska du vara med?'
   );
+}, {
+  timezone: 'Europe/Stockholm',
 });
+
+/* Tredje DM 16:00 Måndag */
+
+cron.schedule('0 16 * * 1', async () => {
+  const guild = getGuild();
+  if (!guild) return;
+
+  console.log("Running tredje DM 16:00 måndag");
+
+  await sendDMsToRoleMembers(
+    guild,
+    'SUP CHAT',
+    'Ikväll är det raid vid 18:00 ska du vara med?'
+  );
+}, {
+  timezone: 'Europe/Stockholm',
+});
+
+
 
 cron.schedule('15 * * * 2', async () => {
   clearResponses();
