@@ -565,6 +565,62 @@ async function testCron() {
   console.log("Cron is running each minute");
 }
 
+
+
+/* Rensar listan 15:00 tisdag */
+cron.schedule('0 15 * * 2', async () => {
+  clearResponses();
+  console.log('🗑️ All responses have been cleared tisdag 15:00');
+}, {
+  timezone: 'Europe/Stockholm',
+});
+
+/* Pingar 17:00 onsdag */
+cron.schedule('0 17 * * 3', async () => {
+  console.log('Pingar onsdag 17:00');
+}, {
+  timezone: 'Europe/Stockholm',
+});
+
+/* Pingar 17:00 torsdag */
+cron.schedule('0 17 * * 4', async () => {
+  console.log('Pingar torsdag 17:00');
+}, {
+  timezone: 'Europe/Stockholm',
+});
+
+/* Pingar 17:00 fredag */
+cron.schedule('0 17 * * 5', async () => {
+  console.log('Pingar fredag 17:00');
+}, {
+  timezone: 'Europe/Stockholm',
+});
+
+/* Pingar 17:00 lördag */
+cron.schedule('0 17 * * 6', async () => {
+  console.log('Pingar lördag 17:00');
+}, {
+  timezone: 'Europe/Stockholm',
+});
+
+/* Pingar 12:00 söndag */
+cron.schedule('0 12 * * 0', async () => {
+  console.log('Pingar söndag 12:00');
+}, {
+  timezone: 'Europe/Stockholm',
+});
+
+
+/* Rensar listan 18:59 söndag */
+cron.schedule('59 18 * * 0', async () => {
+  clearResponses();
+  console.log('🗑️ All responses have been cleared söndag 18:59');
+}, {
+  timezone: 'Europe/Stockholm',
+});
+
+
+/* Skickar raid announcement 19:00 söndag */
 cron.schedule('0 19 * * 0', async () => {
   const guild = getGuild();
   if (!guild) return;
@@ -635,13 +691,6 @@ cron.schedule('0 17 * * 1', async () => {
 
 }, {
   timezone: 'Europe/Stockholm',
-});
-
-
-
-cron.schedule('15 * * * 2', async () => {
-  clearResponses();
-  console.log('🗑️ All responses have been cleared');
 });
 
 
